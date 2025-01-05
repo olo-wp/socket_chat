@@ -2,7 +2,8 @@ package org.chat;
 import java.net.*;
 import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import static org.chat.Marcos.PORT;
+import static org.chat.Marcos.*;
+import static org.chat.Error_descriptions.*;
 
 public class ChatServer {
     private ServerSocket serverSocket;
@@ -84,7 +85,7 @@ public class ChatServer {
             }
         }
         private String setName(){
-            out.println("Enter your username:");
+            out.println(ASK_USERNAME);
             try {
                 String res = in.readLine();
                 return res;
@@ -94,10 +95,10 @@ public class ChatServer {
             return null;
         }
 
-        public void sendToAll(String message, Handler source){
+        public void sendToAll(StandardMessage message, Handler source){
             for(Handler h : chatServ.currentClients){
                 if(h != source){
-                    h.sendMes(message, this.getName(), h.getName());
+                    h.sendMes(message);
                 }
             }
         }
@@ -109,20 +110,22 @@ public class ChatServer {
                 if(!chatServ.isNameUsed(Name, this)) break;
             }
             System.out.println(Name + " connected");
-            out.println("To write a org.chat.message to all simply type it. \n if you want to " +
-                    "send a org.chat.message to a certain user, format it this way: ./[USERNAME] [MESSAGE]");
+            out.println(USER_INFO);
             try {
                 String mes;
                 while ((mes = in.readLine()) != null){
                     StandardMessage parsedMessage = new StandardMessage();
                     parsedMessage.mesparse(mes);
                     if(parsedMessage.getMessage() == null){
-                        this.out.println("SENDING FAILED: MESSAGE CAN NOT BE EMPTY");
+                        this.out.println(NO_MSG_ERROR);
                     } else if(parsedMessage.getTarget() == null){
-                        this.out.println("SENDING FAILED: TARGET CAN NOT BE EMPTY IN A TARGETED MESSAGE");
-                    } else {
+                        this.out.println(NO_TARGET_ERROR);
+                    } else if(!parsedMessage.getTarget().isEmpty()){
+                        System.out.println(Name + " >> " + parsedMessage.getTarget() + "[PV]: " + parsedMessage.getMessage());
+                        sendMes(parsedMessage);
+                    } else{
                         System.out.println(Name + ": " + parsedMessage.getMessage());
-                        sendToAll(mes, this);
+                        sendToAll(parsedMessage, this);
                     }
                 }
                 this.stop();
@@ -135,9 +138,9 @@ public class ChatServer {
             return Name;
         }
 
-        public void sendMes(String mes, String name, String targt){
-            Handler target = chatServ.returnHandlerWithGivenUsername(targt);
-            target.out.println(name + ": " + mes);
+        public void sendMes(StandardMessage mes){
+            Handler target = chatServ.returnHandlerWithGivenUsername(mes.getTarget());
+            target.out.println("<<" + this.getName() + ">>: " + mes.getMessage());
         }
 
 
