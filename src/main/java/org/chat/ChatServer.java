@@ -98,7 +98,7 @@ public class ChatServer {
         public void sendToAll(StandardMessage message, Handler source){
             for(Handler h : chatServ.currentClients){
                 if(h != source){
-                    h.sendMes(message);
+                    h.out.println(message.getMessage());
                 }
             }
         }
@@ -108,10 +108,12 @@ public class ChatServer {
             while(true){
                 Name = setName();
                 if(!chatServ.isNameUsed(Name, this)) break;
+                out.println(USERNAME_TAKEN);
             }
             System.out.println(Name + " connected");
             out.println(USER_INFO);
             try {
+
                 String mes;
                 while ((mes = in.readLine()) != null){
                     StandardMessage parsedMessage = new StandardMessage();
