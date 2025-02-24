@@ -7,7 +7,11 @@ public class StandardMessage implements message{
     @Override
     public void mesparse(String mes) {
         mes = mes.strip();
-        if(mes.length() <= 2) message = mes;
+        if (mes.isEmpty()) return;
+        if(mes.length() <= 2){
+            message = mes;
+            target = "";
+        }
         else if (mes.startsWith("./")) {
             int end = mes.indexOf(' ');
             if(end == -1){
@@ -30,11 +34,9 @@ public class StandardMessage implements message{
             message = mes;
         }
     }
-    @Override
     public String getMessage(){
         return message;
     }
-    @Override
     public String getTarget() {
         return target;
     }

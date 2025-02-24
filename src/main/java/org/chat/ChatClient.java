@@ -11,6 +11,7 @@ public class ChatClient {
     private PrintWriter out;
     private BufferedReader in;
 
+
     public ChatClient(String host, int port) {
         try {
             clientSocket = new Socket(host, port);
